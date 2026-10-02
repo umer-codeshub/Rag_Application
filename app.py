@@ -1,4 +1,4 @@
-```python
+
 """Streamlit UI only. All RAG logic lives in rag.py."""
 
 import logging
