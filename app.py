@@ -1,6 +1,5 @@
 
 """Streamlit UI only. All RAG logic lives in rag.py."""
-
 import logging
 import os
 
@@ -17,342 +16,314 @@ st.set_page_config(
 )
 
 # ============================================================
-# CHATGPT STYLE UI
+# PROFESSIONAL UI STYLING
 # ============================================================
 
 st.markdown(
     """
     <style>
 
-    /* ========================================================
-       GLOBAL
-    ======================================================== */
+    /* ---------- Global ---------- */
 
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
     html, body, [class*="css"] {
-        font-family: "Inter", sans-serif;
+        font-family: 'Inter', sans-serif;
     }
 
     .stApp {
-        background: #ffffff;
+        background: #f8fafc;
+        color: #111827;
     }
 
     .main .block-container {
-        max-width: 900px;
-        padding-top: 0.5rem;
-        padding-bottom: 8rem;
+        max-width: 1180px;
+        padding-top: 2.5rem;
+        padding-bottom: 4rem;
     }
 
-
-    /* ========================================================
-       SIDEBAR
-       ======================================================== */
+    /* ---------- Sidebar ---------- */
 
     section[data-testid="stSidebar"] {
-        background: #f7f7f8;
-        border-right: 1px solid #e5e5e5;
+        background: #ffffff;
+        border-right: 1px solid #e5e7eb;
     }
 
     section[data-testid="stSidebar"] > div {
-        padding: 0.75rem 0.75rem;
+        padding: 1.5rem 1.15rem;
     }
 
-    section[data-testid="stSidebar"] h1,
     section[data-testid="stSidebar"] h2,
     section[data-testid="stSidebar"] h3 {
-        color: #202123;
+        color: #111827;
+        font-weight: 650;
+        letter-spacing: -0.02em;
     }
 
-    .sidebar-brand {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 8px 10px 18px 10px;
-    }
+    /* ---------- Sidebar headings ---------- */
 
-    .sidebar-brand-icon {
-        width: 30px;
-        height: 30px;
-        border-radius: 8px;
-        background: #202123;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 15px;
-    }
-
-    .sidebar-brand-text {
-        font-size: 15px;
-        font-weight: 600;
-        color: #202123;
-    }
-
-    .sidebar-section {
-        font-size: 11px;
-        font-weight: 600;
-        color: #8e8e8e;
+    .sidebar-section-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #6b7280;
         text-transform: uppercase;
-        letter-spacing: 0.06em;
-        margin: 20px 10px 8px 10px;
+        letter-spacing: 0.08em;
+        margin-top: 1.6rem;
+        margin-bottom: 0.7rem;
     }
 
+    /* ---------- Header ---------- */
 
-    /* ========================================================
-       SIDEBAR BUTTONS
-       ======================================================== */
-
-    section[data-testid="stSidebar"] .stButton > button {
-        width: 100%;
-        background: transparent;
-        border: 0;
-        color: #343541;
-        border-radius: 8px;
-        text-align: left;
-        padding: 9px 10px;
-        font-size: 13px;
-        font-weight: 500;
+    .app-header {
+        margin-bottom: 2rem;
     }
 
-    section[data-testid="stSidebar"] .stButton > button:hover {
-        background: #ececec;
-        color: #202123;
-    }
-
-
-    /* ========================================================
-       SIDEBAR INPUTS
-       ======================================================== */
-
-    section[data-testid="stSidebar"] .stSlider {
-        padding: 0 6px;
-    }
-
-    section[data-testid="stSidebar"] [data-testid="stFileUploader"] {
+    .app-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.35rem 0.7rem;
+        border: 1px solid #dbe3ef;
+        border-radius: 999px;
         background: #ffffff;
-        border: 1px solid #dedede;
-        border-radius: 8px;
-    }
-
-
-    /* ========================================================
-       MAIN HEADER
-       ======================================================== */
-
-    .top-header {
-        height: 58px;
-        display: flex;
-        align-items: center;
-        border-bottom: 1px solid #f0f0f0;
-        margin-bottom: 1.5rem;
-    }
-
-    .model-name {
-        font-size: 15px;
+        color: #475569;
+        font-size: 0.75rem;
         font-weight: 600;
-        color: #202123;
+        margin-bottom: 0.85rem;
     }
 
-    .model-status {
-        color: #8e8e8e;
-        font-size: 13px;
-        margin-left: 7px;
+    .app-title {
+        font-size: 2.45rem;
+        line-height: 1.1;
+        font-weight: 700;
+        letter-spacing: -0.045em;
+        color: #0f172a;
+        margin: 0;
     }
 
-
-    /* ========================================================
-       WELCOME SCREEN
-       ======================================================== */
-
-    .welcome {
-        min-height: 55vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
+    .app-subtitle {
+        margin-top: 0.7rem;
+        max-width: 720px;
+        color: #64748b;
+        font-size: 1rem;
+        line-height: 1.65;
     }
 
-    .welcome-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 14px;
-        background: #202123;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 22px;
-        margin-bottom: 20px;
+    /* ---------- Chat area ---------- */
+
+    .chat-container {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 1rem;
+        margin-top: 1rem;
     }
 
-    .welcome-title {
-        font-size: 28px;
-        font-weight: 600;
-        color: #202123;
-        letter-spacing: -0.03em;
-    }
-
-    .welcome-subtitle {
-        max-width: 560px;
-        color: #6b6b6b;
-        font-size: 14px;
-        line-height: 1.6;
-        margin-top: 10px;
-    }
-
-
-    /* ========================================================
-       CHAT MESSAGES
-       ======================================================== */
+    /* ---------- Chat messages ---------- */
 
     [data-testid="stChatMessage"] {
-        border: none !important;
-        background: transparent !important;
-        padding: 1.25rem 0 !important;
-        margin: 0 !important;
+        border-radius: 14px;
+        padding: 0.85rem 1rem;
+        margin-bottom: 0.6rem;
     }
-
-    [data-testid="stChatMessage"] > div:first-child {
-        margin-right: 14px;
-    }
-
-    [data-testid="stChatMessageContent"] {
-        color: #2d2d2d;
-        font-size: 15px;
-        line-height: 1.7;
-    }
-
-
-    /* ========================================================
-       USER MESSAGE
-       ======================================================== */
 
     [data-testid="stChatMessage"]:has(
         [data-testid="chatAvatarIcon-user"]
     ) {
-        background: #f7f7f8 !important;
-        border-radius: 12px !important;
-        padding: 1rem 1.1rem !important;
-        margin: 0.5rem 0 !important;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
     }
-
-
-    /* ========================================================
-       ASSISTANT MESSAGE
-       ======================================================== */
 
     [data-testid="stChatMessage"]:has(
         [data-testid="chatAvatarIcon-assistant"]
     ) {
-        background: #ffffff !important;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
     }
 
+    /* ---------- Source section ---------- */
 
-    /* ========================================================
-       CHAT INPUT
-       ======================================================== */
+    .source-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        margin-top: 0.8rem;
+        margin-bottom: 0.4rem;
+    }
+
+    /* ---------- Buttons ---------- */
+
+    .stButton > button {
+        border-radius: 9px;
+        border: 1px solid #d1d5db;
+        background: #ffffff;
+        color: #111827;
+        font-weight: 600;
+        min-height: 42px;
+        transition: all 0.15s ease;
+    }
+
+    .stButton > button:hover {
+        border-color: #94a3b8;
+        background: #f8fafc;
+        color: #111827;
+    }
+
+    /* ---------- Primary buttons ---------- */
+
+    .stButton > button[kind="primary"] {
+        background: #111827;
+        color: #ffffff;
+        border-color: #111827;
+    }
+
+    .stButton > button[kind="primary"]:hover {
+        background: #1f2937;
+        border-color: #1f2937;
+        color: #ffffff;
+    }
+
+    /* ---------- File uploader ---------- */
+
+    [data-testid="stFileUploader"] {
+        border: 1px dashed #cbd5e1;
+        border-radius: 12px;
+        background: #f8fafc;
+        padding: 0.25rem;
+    }
+
+    [data-testid="stFileUploader"]:hover {
+        border-color: #94a3b8;
+    }
+
+    /* ---------- Sliders ---------- */
+
+    [data-testid="stSlider"] {
+        padding-top: 0.25rem;
+    }
+
+    /* ---------- Expander ---------- */
+
+    [data-testid="stExpander"] {
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #ffffff;
+    }
+
+    /* ---------- Info / Warning / Error ---------- */
+
+    [data-testid="stAlert"] {
+        border-radius: 10px;
+        border-width: 1px;
+    }
+
+    /* ---------- Chat input ---------- */
 
     [data-testid="stChatInput"] {
-        position: fixed;
-        bottom: 18px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: min(850px, calc(100vw - 360px));
-        z-index: 999;
-    }
-
-    [data-testid="stChatInput"] > div {
-        background: #ffffff;
-        border: 1px solid #d9d9d9;
-        border-radius: 16px;
-        box-shadow:
-            0 2px 6px rgba(0,0,0,0.05),
-            0 8px 24px rgba(0,0,0,0.06);
+        padding-bottom: 1rem;
     }
 
     [data-testid="stChatInput"] textarea {
-        font-size: 15px;
-        color: #202123;
-        padding: 12px 15px;
+        border-radius: 12px;
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        font-size: 0.95rem;
     }
 
     [data-testid="stChatInput"] textarea:focus {
-        box-shadow: none !important;
-        border-color: transparent !important;
+        border-color: #64748b;
+        box-shadow: 0 0 0 1px #64748b;
     }
 
+    /* ---------- Knowledge base cards ---------- */
 
-    /* ========================================================
-       SOURCES
-       ======================================================== */
-
-    .source-header {
-        color: #6b6b6b;
-        font-size: 12px;
-        font-weight: 600;
-        margin-top: 14px;
-        margin-bottom: 5px;
-    }
-
-    [data-testid="stExpander"] {
-        border: 1px solid #e5e5e5;
-        border-radius: 9px;
-        background: #fafafa;
-    }
-
-
-    /* ========================================================
-       EMPTY STATE SUGGESTIONS
-       ======================================================== */
-
-    .suggestion {
-        border: 1px solid #e5e5e5;
-        border-radius: 10px;
-        padding: 12px 14px;
-        margin-top: 8px;
-        color: #4b4b4b;
-        font-size: 13px;
-        text-align: left;
+    .stat-card {
         background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+        margin-bottom: 0.5rem;
     }
 
-
-    /* ========================================================
-       FOOTER
-       ======================================================== */
-
-    .footer {
-        position: fixed;
-        bottom: 2px;
-        left: 50%;
-        transform: translateX(-50%);
-        color: #9a9a9a;
-        font-size: 10px;
-        z-index: 1000;
+    .stat-label {
+        color: #64748b;
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
     }
 
+    .stat-value {
+        color: #0f172a;
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin-top: 0.15rem;
+    }
 
-    /* ========================================================
-       MOBILE
-       ======================================================== */
+    /* ---------- Empty state ---------- */
 
-    @media (max-width: 900px) {
+    .empty-state {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        margin: 2rem 0 1rem 0;
+    }
+
+    .empty-icon {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 1rem auto;
+        border-radius: 12px;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+    }
+
+    .empty-title {
+        color: #111827;
+        font-size: 1.05rem;
+        font-weight: 650;
+        margin-bottom: 0.4rem;
+    }
+
+    .empty-text {
+        color: #64748b;
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    /* ---------- Footer ---------- */
+
+    .app-footer {
+        text-align: center;
+        color: #94a3b8;
+        font-size: 0.75rem;
+        margin-top: 3rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    /* ---------- Mobile ---------- */
+
+    @media (max-width: 768px) {
 
         .main .block-container {
-            max-width: 100%;
-            padding-left: 1rem;
-            padding-right: 1rem;
+            padding: 1.5rem 1rem 3rem 1rem;
         }
 
-        [data-testid="stChatInput"] {
-            width: calc(100vw - 30px);
+        .app-title {
+            font-size: 2rem;
         }
 
-        .welcome-title {
-            font-size: 24px;
+        .app-subtitle {
+            font-size: 0.9rem;
         }
+
     }
 
     </style>
@@ -360,9 +331,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
 # ============================================================
-# STREAMLIT SECRETS
+# ENVIRONMENT
 # ============================================================
 
 try:
@@ -372,49 +342,34 @@ try:
 except Exception:
     pass
 
-
-# ============================================================
-# IMPORT RAG SYSTEM
-# ============================================================
-
 import rag
 from embeddings import Embedder
 from errors import RAGError
 from vector_store import VectorStore
 
-
 logging.basicConfig(level=logging.INFO)
-
 logger = logging.getLogger(__name__)
 
 
 # ============================================================
-# LOAD RESOURCES
+# RESOURCE LOADING
 # ============================================================
 
 @st.cache_resource(
     show_spinner="Loading knowledge base..."
 )
 def load_resources():
-
-    embedder = Embedder(
-        rag.EMBEDDING_MODEL_NAME
-    )
-
-    kb_store = rag.build_kb_store(
-        embedder
-    )
-
+    embedder = Embedder(rag.EMBEDDING_MODEL_NAME)
+    kb_store = rag.build_kb_store(embedder)
     return embedder, kb_store
 
 
 def render_sources(sources):
-
     if not sources:
         return
 
     st.markdown(
-        '<div class="source-header">Sources</div>',
+        '<div class="source-label">Sources</div>',
         unsafe_allow_html=True,
     )
 
@@ -425,33 +380,29 @@ def render_sources(sources):
         )
     )
 
-    st.caption(
-        " · ".join(names)
-    )
+    st.caption(" · ".join(names))
 
-    for i, s in enumerate(
-        sources,
-        start=1
-    ):
-
+    for i, s in enumerate(sources, start=1):
         with st.expander(
-            f"Source {i} · {s['doc_name']} · {s['score']:.3f}"
+            f"Source {i}  ·  {s['doc_name']}  ·  {s['score']:.3f}"
         ):
-
             st.markdown(
-                s["text"]
+                f"""
+                <div style="
+                    color:#475569;
+                    font-size:0.9rem;
+                    line-height:1.7;
+                    padding:0.25rem 0;
+                ">
+                    {s["text"]}
+                </div>
+                """,
+                unsafe_allow_html=True,
             )
 
 
 def tidy(answer: str) -> str:
-
-    return answer.replace(
-        "【",
-        "["
-    ).replace(
-        "】",
-        "]"
-    )
+    return answer.replace("【", "[").replace("】", "]")
 
 
 # ============================================================
@@ -459,11 +410,9 @@ def tidy(answer: str) -> str:
 # ============================================================
 
 try:
-
     embedder, kb_store = load_resources()
 
 except RAGError as e:
-
     st.error(str(e))
     st.stop()
 
@@ -473,16 +422,12 @@ except RAGError as e:
 # ============================================================
 
 if "messages" not in st.session_state:
-
     st.session_state.messages = []
 
-
 if "upload_store" not in st.session_state:
-
     st.session_state.upload_store = VectorStore(
         embedder.dim
     )
-
 
 upload_store = st.session_state.upload_store
 
@@ -495,98 +440,39 @@ with st.sidebar:
 
     st.markdown(
         """
-        <div class="sidebar-brand">
+        <div style="
+            font-size:1.35rem;
+            font-weight:700;
+            letter-spacing:-0.03em;
+            color:#0f172a;
+            margin-bottom:0.2rem;
+        ">
+            Knowledge Base
+        </div>
 
-            <div class="sidebar-brand-icon">
-                ✦
-            </div>
-
-            <div class="sidebar-brand-text">
-                AI Knowledge Base
-            </div>
-
+        <div style="
+            color:#64748b;
+            font-size:0.82rem;
+            margin-bottom:1.5rem;
+        ">
+            Retrieval augmented workspace
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-
-    # -----------------------------------------
-    # New conversation
-    # -----------------------------------------
-
-    if st.button(
-        "＋  New conversation",
-        use_container_width=True,
-    ):
-
-        st.session_state.messages = []
-
-        st.rerun()
-
-
     st.markdown(
-        '<div class="sidebar-section">Conversation</div>',
+        '<div class="sidebar-section-title">Retrieval</div>',
         unsafe_allow_html=True,
     )
-
-
-    if st.session_state.messages:
-
-        st.caption(
-            "Current conversation"
-        )
-
-        first_user_message = next(
-            (
-                m["content"]
-                for m in st.session_state.messages
-                if m["role"] == "user"
-            ),
-            "New conversation",
-        )
-
-        display_title = first_user_message[:42]
-
-        if len(first_user_message) > 42:
-
-            display_title += "..."
-
-        st.markdown(
-            f"""
-            <div style="
-                background:#ececec;
-                padding:9px 10px;
-                border-radius:8px;
-                font-size:13px;
-                color:#343541;
-                margin-bottom:8px;
-            ">
-                💬 {display_title}
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-
-    # -----------------------------------------
-    # Retrieval
-    # -----------------------------------------
-
-    st.markdown(
-        '<div class="sidebar-section">Retrieval settings</div>',
-        unsafe_allow_html=True,
-    )
-
 
     top_k = st.slider(
         "Top K",
         1,
         10,
         rag.TOP_K,
-        help="Number of chunks retrieved.",
+        help="Number of document chunks retrieved for each question.",
     )
-
 
     min_score = st.slider(
         "Relevance threshold",
@@ -594,35 +480,38 @@ with st.sidebar:
         0.6,
         rag.MIN_SCORE,
         0.05,
-        help="Chunks below this similarity are ignored.",
+        help="Chunks below this similarity score are ignored.",
     )
 
-
-    # -----------------------------------------
-    # Documents
-    # -----------------------------------------
-
     st.markdown(
-        '<div class="sidebar-section">Knowledge base</div>',
+        '<div class="sidebar-section-title">Conversation</div>',
         unsafe_allow_html=True,
     )
 
+    if st.button(
+        "Clear conversation",
+        use_container_width=True,
+    ):
+        st.session_state.messages = []
+        st.rerun()
 
-    uploaded_files = st.file_uploader(
-        "Upload documents",
-        type=[
-            "txt",
-            "md",
-            "pdf",
-        ],
-        accept_multiple_files=True,
+    st.markdown(
+        '<div class="sidebar-section-title">Documents</div>',
+        unsafe_allow_html=True,
     )
 
+    uploaded_files = st.file_uploader(
+        "Upload TXT, MD or PDF files",
+        type=["txt", "md", "pdf"],
+        accept_multiple_files=True,
+        label_visibility="visible",
+    )
 
     if st.button(
-        "Add documents",
+        "Add to knowledge base",
         disabled=not uploaded_files,
         use_container_width=True,
+        type="primary",
     ):
 
         for f in uploaded_files:
@@ -641,26 +530,21 @@ with st.sidebar:
                         known_stores=(kb_store,),
                     )
 
-
                 if added == 0:
 
                     st.info(
-                        f"{f.name} already exists."
+                        f"{f.name} is already in the knowledge base."
                     )
 
                 else:
 
                     st.success(
-                        f"{f.name} added."
+                        f"{f.name} added, {added} chunks."
                     )
-
 
             except RAGError as e:
 
-                st.error(
-                    str(e)
-                )
-
+                st.error(str(e))
 
             except Exception:
 
@@ -669,73 +553,74 @@ with st.sidebar:
                 )
 
                 st.error(
-                    f"Could not process {f.name}."
+                    f"Something went wrong while processing {f.name}."
                 )
 
-
-    # -----------------------------------------
-    # Knowledge base stats
-    # -----------------------------------------
-
     st.markdown(
-        '<div class="sidebar-section">Knowledge base</div>',
+        '<div class="sidebar-section-title">Knowledge base</div>',
         unsafe_allow_html=True,
     )
 
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        st.markdown(
+            f"""
+            <div class="stat-card">
+                <div class="stat-label">Documents</div>
+                <div class="stat-value">
+                    {len(kb_store.document_names())}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with col2:
+
+        st.markdown(
+            f"""
+            <div class="stat-card">
+                <div class="stat-label">Chunks</div>
+                <div class="stat-value">
+                    {len(kb_store)}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     st.caption(
-        f"Built in documents: "
-        f"{len(kb_store.document_names())}"
+        f"Session uploads: {len(upload_store.document_names())} documents, "
+        f"{len(upload_store)} chunks"
     )
 
-
-    st.caption(
-        f"Built in chunks: "
-        f"{len(kb_store)}"
-    )
-
-
-    st.caption(
-        f"Your documents: "
-        f"{len(upload_store.document_names())}"
-    )
-
-
-    with st.expander(
-        "View documents"
-    ):
+    with st.expander("View documents"):
 
         all_documents = (
             kb_store.document_names()
             + upload_store.document_names()
         )
 
-
         if all_documents:
 
             for name in all_documents:
-
-                st.write(
-                    f"📄 {name}"
+                st.markdown(
+                    f"📄 `{name}`"
                 )
 
         else:
 
             st.caption(
-                "No documents."
+                "No documents available."
             )
 
-
-    # -----------------------------------------
-    # API warning
-    # -----------------------------------------
-
-    if not os.getenv(
-        "GROQ_API_KEY"
-    ):
+    if not os.getenv("GROQ_API_KEY"):
 
         st.warning(
-            "GROQ_API_KEY is not configured."
+            "GROQ_API_KEY is not configured. "
+            "Retrieval will work, but answer generation will not."
         )
 
 
@@ -745,15 +630,20 @@ with st.sidebar:
 
 st.markdown(
     """
-    <div class="top-header">
+    <div class="app-header">
 
-        <span class="model-name">
+        <div class="app-eyebrow">
+            📚 Knowledge Retrieval
+        </div>
+
+        <h1 class="app-title">
             AI Knowledge Base
-        </span>
+        </h1>
 
-        <span class="model-status">
-            RAG
-        </span>
+        <div class="app-subtitle">
+            Ask questions across your documents and receive
+            grounded answers with transparent source references.
+        </div>
 
     </div>
     """,
@@ -762,52 +652,41 @@ st.markdown(
 
 
 # ============================================================
-# WELCOME SCREEN
+# EMPTY STATE
 # ============================================================
 
 if not st.session_state.messages:
 
     st.markdown(
         """
-        <div class="welcome">
+        <div class="empty-state">
 
-            <div class="welcome-icon">
-                ✦
+            <div class="empty-icon">
+                📖
             </div>
 
-            <div class="welcome-title">
-                What can I help you find?
+            <div class="empty-title">
+                Ask something about your knowledge base
             </div>
 
-            <div class="welcome-subtitle">
-                Ask questions about the documents in your
-                knowledge base. Answers are generated from
-                retrieved document context.
-            </div>
-
-            <div style="
-                width:100%;
-                max-width:600px;
-                margin-top:28px;
-            ">
-
-                <div class="suggestion">
-                    What GPA is needed for the AI internship?
-                </div>
-
-                <div class="suggestion">
-                    Which course teaches MLOps and when?
-                </div>
-
-                <div class="suggestion">
-                    Summarize the main requirements from the documents.
-                </div>
-
+            <div class="empty-text">
+                Your questions are answered using the documents
+                available in the knowledge base.
+                Try asking about a specific topic, requirement,
+                course, concept, or document.
             </div>
 
         </div>
         """,
         unsafe_allow_html=True,
+    )
+
+    st.caption(
+        "Example: What GPA is needed for the AI internship?"
+    )
+
+    st.caption(
+        "Example: Which course teaches MLOps and when?"
     )
 
 
@@ -835,10 +714,8 @@ for message in st.session_state.messages:
 # ============================================================
 
 if prompt := st.chat_input(
-    "Message AI Knowledge Base..."
+    "Ask a question about your documents..."
 ):
-
-    # User message
 
     st.session_state.messages.append(
         {
@@ -847,26 +724,16 @@ if prompt := st.chat_input(
         }
     )
 
+    with st.chat_message("user"):
 
-    with st.chat_message(
-        "user"
-    ):
+        st.markdown(prompt)
 
-        st.markdown(
-            prompt
-        )
-
-
-    # Assistant response
-
-    with st.chat_message(
-        "assistant"
-    ):
+    with st.chat_message("assistant"):
 
         try:
 
             with st.spinner(
-                "Searching..."
+                "Searching the knowledge base..."
             ):
 
                 out = rag.rag_query(
@@ -880,21 +747,15 @@ if prompt := st.chat_input(
                     min_score,
                 )
 
-
             answer = tidy(
                 out["answer"]
             )
 
-
-            st.markdown(
-                answer
-            )
-
+            st.markdown(answer)
 
             render_sources(
                 out["sources"]
             )
-
 
             st.session_state.messages.append(
                 {
@@ -904,13 +765,11 @@ if prompt := st.chat_input(
                 }
             )
 
-
         except RAGError as e:
 
             st.error(
                 str(e)
             )
-
 
         except Exception:
 
@@ -929,8 +788,8 @@ if prompt := st.chat_input(
 
 st.markdown(
     """
-    <div class="footer">
-        AI Knowledge Base
+    <div class="app-footer">
+        AI Knowledge Base · Retrieval augmented generation
     </div>
     """,
     unsafe_allow_html=True,
